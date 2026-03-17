@@ -7,13 +7,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use App\Http\Resources\PostResource;
 
 class PostApiController extends Controller
 {
     //
     public function index()
     {
-        return response()->json(Post::all(), 200);
+        $posts = Post::with('user')->get();
+        
+        return PostResource::collection($posts);
     }
 
     public function store(Request $request)
@@ -25,12 +28,12 @@ class PostApiController extends Controller
 
         $post = Auth::user()->posts()->create($validated);
 
-        return response()->json($post, 201);
+        return new PostResource($post);
     }
 
     public function show(Post $post)
     {
-        return response()->json($post, 200);
+        return new PostResource($post);
     }
 
     public function update(Request $request, Post $post)
@@ -47,7 +50,7 @@ class PostApiController extends Controller
 
         $post->update($validated);
 
-        return response()->json($post, 200);
+        return new PostResource($post);
     }
 
     public function destroy(Request $request, Post $post)
