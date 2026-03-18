@@ -38,12 +38,11 @@ class PostApiController extends Controller
 
     public function update(Request $request, Post $post)
     {
-        if ($request->user()->id !== $post->user_id) {
+        if (Auth::id() !== $post->user_id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
         $validated = $request->validate([
-            // Unique except for the current post ID
             'title'   => ['required', 'max:255', Rule::unique('posts')->ignore($post->id)],
             'content' => 'required',
         ]);
@@ -55,8 +54,7 @@ class PostApiController extends Controller
 
     public function destroy(Request $request, Post $post)
     {
-        // Authorization: Ensure only the owner can delete
-        if ($request->user()->id !== $post->user_id) {
+        if (Auth::id() !== $post->user_id) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
